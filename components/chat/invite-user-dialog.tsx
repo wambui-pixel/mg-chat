@@ -68,11 +68,11 @@ export function InviteMember({
             queryParams: { offset: 0, limit: 10 },
         });
 
-        const adminRole = roleResponse?.data?.roles?.find(
-            (role) => role.name === "admin"
+        const memberRole = roleResponse?.data?.roles?.find(
+            (role) => role.name === "domain-member"
         );
 
-        const roleId = adminRole?.id as string;
+        const roleId = memberRole?.id as string;
 
         const response = await InviteMultipleUsersToWorkspace(values.userIds, roleId, workspaceId);
 

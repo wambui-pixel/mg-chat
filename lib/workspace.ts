@@ -332,3 +332,33 @@ export const GetWorkspaceInfo = async (listRoles?: boolean) => {
     };
   }
 };
+
+export const CreateWorkspaceRole = async (
+  roleName: string,
+  domain: string,
+  optionalActions?: string[],
+  optionalMembers?: string[],
+) => {
+  const { workspaceId, accessToken } = await validateOrGetToken("");
+  try {
+    const role = await mgSdk.Domains.CreateDomainRole(
+      domain ?? workspaceId,
+      roleName,
+      accessToken,
+      optionalActions,
+      optionalMembers,
+    );
+    return {
+      data: role,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/");
+  }
+};

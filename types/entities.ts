@@ -48,3 +48,10 @@ export enum Status {
   Disabled = "disabled",
   All = "all",
 }
+
+export interface RoleMembersPage {
+  total: number;
+  limit: number;
+  offset: number;
+  members: UserBasicInfo[];
+}

@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Domain, Rule } from "@absmach/magistrala-sdk";
-import { CreateWorkspace } from "@/lib/workspace";
+import { CreateWorkspace, CreateWorkspaceRole } from "@/lib/workspace";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateChannel } from "@/lib/channels";
@@ -44,12 +44,18 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
     };
 
     const result = await CreateWorkspace(newWorkspace);
-    if (result.error !== null) {
-      toast.error(`Failed to create workspace with error: ${result.error}`, { id: toastId });
+    if (result.error === null) {
+      const optionalActions = ["read", "view_role_users", "channel_create"]
+      const roleResponse = await CreateWorkspaceRole("domain-member", result?.data?.id as string, optionalActions);
+      if (roleResponse.error !== null) {
+        toast.error(`Failed to create workspace role with error: ${roleResponse.error}`, { id: toastId });
+      } else {
+        toast.success("Workspace created successfully", { id: toastId });
+      }
     } else {
       const createChanresp = await CreateChannel(
         { name: "direct-message", tags: ["dm"] },
-        result.data.id as string
+        result?.data.id as string
       );
 
       if (createChanresp.error !== null) {

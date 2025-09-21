@@ -6,15 +6,17 @@ import { Session } from "@/types/auth";
 import { useState } from "react";
 import { Member } from "@/types/entities";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
+import { EntityFetchData } from "@/lib/actions";
 
 interface Props {
   session: Session;
   members: Member[];
   invitationsPage: InvitationsPage;
   dmChannelId: string;
-  user: User
+  user: User;
+  initMembers: EntityFetchData;
 }
-export default function ChatPage({ session, members, invitationsPage, dmChannelId, user }: Props) {
+export default function ChatPage({ session, members, invitationsPage, dmChannelId, user, initMembers }: Props) {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedDM, setSelectedDM] = useState<string | null>(session?.user?.id as string);
   const workspaceId = session.workspace
@@ -47,6 +49,7 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
           session={session}
           workspaceId={workspaceId as string}
           dmChannelId={dmChannelId as string} 
+          initMembers={initMembers}
         />
       </div>
     </>

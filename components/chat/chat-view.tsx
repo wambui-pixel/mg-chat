@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, Hash, MessageCircle, EllipsisVertical } from "lucide-react";
+import { Menu, Hash, MessageCircle } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
-import { Channel, Client, User } from "@absmach/magistrala-sdk";
-import { ListChannelMembers, ViewChannel } from "@/lib/channels";
+import { Channel, ChannelsPage, Client, User } from "@absmach/magistrala-sdk";
+import { ListChannelMembers, ListChannelRoles, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
 import { UserProfile, ViewUser } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
+import { ChatMenu } from "./chat-menu";
+import { EntityFetchData } from "@/lib/actions";
+import { ListChannelRoleMembers } from "@/lib/roles";
 
 interface Props {
   selectedChannel: string | null;
@@ -19,6 +22,7 @@ interface Props {
   session: Session;
   workspaceId: string;
   dmChannelId: string;
+  initMembers: EntityFetchData;
 }
 
 export function ChatView({
@@ -28,6 +32,7 @@ export function ChatView({
   session,
   workspaceId,
   dmChannelId,
+  initMembers,
 }: Props) {
   const [userId, setUserId] = useState(session?.user?.id);
   const getDMTopic = (userId1: string, userId2: string): string => {
@@ -39,8 +44,8 @@ export function ChatView({
   const { messages, setMessages, sendMessage, connect, setActiveTopic } = useWebSocket();
   const { workspace } = session;
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
-  const [members, setMembers] = useState<Client[]>([]);
   const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
+  const [members, setMembers] = useState<UserBasicInfo[]>([]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -155,15 +160,22 @@ export function ChatView({
 
   useEffect(() => {
     const getMembers = async () => {
-      const response = await ListChannelMembers(
+      const roleResponse = await ListChannelRoles({
+        queryParams: { offset: 0, limit: 10 },
+      });
+
+      const memberRole = roleResponse?.data?.roles?.find(
+        (role) => role.name === "chat-member"
+      );
+
+      const roleId = memberRole?.id as string;
+      const response = await ListChannelRoleMembers(
+        selectedChannel as string,
+        roleId,
         {
-          id: selectedChannel as string,
-          queryParams: {
-            offset: 0,
-            limit: 100,
-          },
-        },
-        workspaceId as string
+        offset: 0,
+        limit: 100,
+      },
       );
       if (response.data) {
         setMembers(response.data.members);
@@ -218,7 +230,7 @@ export function ChatView({
             </>
           )}
         </div>
-        <EllipsisVertical className="h-4 w-4" />
+        <ChatMenu channelId={channelInfo?.id as string} chatName={channelInfo?.name as string} domainId={domain?.id as string} initMembers={initMembers} />
       </div>
 
       <div className="flex-1 flex flex-col">

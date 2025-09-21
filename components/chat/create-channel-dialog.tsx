@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Channel, Rule } from "@absmach/magistrala-sdk";
-import { CreateChannel } from "@/lib/channels";
+import { CreateChannel, CreateChannelRole } from "@/lib/channels";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateRule } from "@/lib/rules";
@@ -67,10 +67,20 @@ export function CreateChannelDialog({ setRevalidate, workspaceId }: Props) {
       if (ruleResponse.error !== null) {
         toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
       } else {
+        const optionalActions = ["read", "publish", "subscribe", "view_role_users"];
+        const roleResponse = await CreateChannelRole(
+          response?.data?.id as string,
+          "chat-member",
+          optionalActions,
+        );
+        if (roleResponse.error !== null) {
+          toast.error(`Failed to create role with error: ${ruleResponse.error}`, { id: toastId });
+        } else {
         setRevalidate(true);
         toast.success("Channel created successfully", { id: toastId });
         setName("");
         setOpen(false);
+        }
       }
     }
     setIsLoading(false);

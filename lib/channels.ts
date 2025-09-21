@@ -1,9 +1,10 @@
 "use server";
 
-import type { Channel } from "@absmach/magistrala-sdk";
+import type { Channel, RolePage } from "@absmach/magistrala-sdk";
 import { revalidatePath } from "next/cache";
 import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { HttpError } from "@/types/errors";
+import { ProcessRoles } from "./workspace";
 
 export const CreateChannel = async (channel: Channel, workspaceId: string) => {
   const { accessToken } = await validateOrGetToken("");
@@ -86,6 +87,65 @@ export const ListChannelMembers = async (
     );
     return {
       data: members,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  }
+};
+
+export const CreateChannelRole = async (
+  channelId: string,
+  roleName: string,
+  optionalActions?: string[],
+  optionalMembers?: string[],
+) => {
+  const { domainId, accessToken } = await validateOrGetToken("");
+  try {
+    const role = await mgSdk.Channels.CreateChannelRole(
+      channelId,
+      roleName,
+      domainId,
+      accessToken,
+      optionalActions,
+      optionalMembers,
+    );
+    return {
+      data: role,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/chat");
+  }
+};
+
+export const ListChannelRoles = async ({ id, queryParams }: RequestOptions) => {
+  const { domainId, accessToken } = await validateOrGetToken("");
+  try {
+    const rolesPage = await mgSdk.Channels.ListChannelRoles(
+      id as string,
+      domainId,
+      queryParams,
+      accessToken,
+    );
+    const roles = await ProcessRoles(rolesPage.roles, accessToken);
+    return {
+      data: {
+        total: rolesPage.total,
+        offset: rolesPage.offset,
+        limit: rolesPage.limit,
+        roles,
+      } as RolePage,
       error: null,
     };
   } catch (err: unknown) {
