@@ -15,11 +15,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Channel, Rule } from "@absmach/magistrala-sdk";
-import { CreateChannel, CreateChannelRole } from "@/lib/channels";
+import { CreateChannel } from "@/lib/channels";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { CreateRule } from "@/lib/rules";
 import { OutputType } from "@/types/entities";
+import { CreateChannelRole } from "@/lib/roles";
 interface Props {
   setRevalidate: (value: boolean) => void;
   workspaceId: string;

@@ -20,7 +20,7 @@ import { EntityType } from "@/types/entities";
 import { ListDomainUsers } from "@/lib/workspace";
 import { EntityFetchData } from "@/lib/actions";
 import { RequestOptions } from "@/lib/magistrala";
-import { ListChannelRoles } from "@/lib/channels";
+import { ListChannelRoles } from "@/lib/roles";
 
 const addRoleMembersFormSchema = () =>
     z.object({

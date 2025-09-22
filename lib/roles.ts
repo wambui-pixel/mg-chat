@@ -1,10 +1,11 @@
 "use server";
 
 import { HttpError } from "@/types/errors";
-import { mgSdk, validateOrGetToken } from "./magistrala";
+import { mgSdk, RequestOptions, validateOrGetToken } from "./magistrala";
 import { revalidatePath } from "next/cache";
-import { PageMetadata } from "@absmach/magistrala-sdk";
+import { PageMetadata, RolePage } from "@absmach/magistrala-sdk";
 import { ProcessRoleMembers } from "./actions";
+import { ProcessRoles } from "./workspace";
 
 
 export const AddChannelRoleMembers = async (
@@ -53,6 +54,65 @@ export const ListChannelRoleMembers = async (
     const processedMembers = await ProcessRoleMembers(members, queryParams);
     return {
       data: processedMembers,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  }
+};
+
+export const CreateChannelRole = async (
+  channelId: string,
+  roleName: string,
+  optionalActions?: string[],
+  optionalMembers?: string[],
+) => {
+  const { domainId, accessToken } = await validateOrGetToken("");
+  try {
+    const role = await mgSdk.Channels.CreateChannelRole(
+      channelId,
+      roleName,
+      domainId,
+      accessToken,
+      optionalActions,
+      optionalMembers,
+    );
+    return {
+      data: role,
+      error: null,
+    };
+  } catch (err: unknown) {
+    const knownError = err as HttpError;
+    return {
+      data: null,
+      error: knownError.error || knownError.message || knownError.toString(),
+    };
+  } finally {
+    revalidatePath("/chat");
+  }
+};
+
+export const ListChannelRoles = async ({ id, queryParams }: RequestOptions) => {
+  const { domainId, accessToken } = await validateOrGetToken("");
+  try {
+    const rolesPage = await mgSdk.Channels.ListChannelRoles(
+      id as string,
+      domainId,
+      queryParams,
+      accessToken,
+    );
+    const roles = await ProcessRoles(rolesPage.roles, accessToken);
+    return {
+      data: {
+        total: rolesPage.total,
+        offset: rolesPage.offset,
+        limit: rolesPage.limit,
+        roles,
+      } as RolePage,
       error: null,
     };
   } catch (err: unknown) {

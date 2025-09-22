@@ -13,7 +13,7 @@ import { UserProfile, ViewUser } from "@/lib/users";
 import { GetMessages } from "@/lib/messages";
 import { ChatMenu } from "./chat-menu";
 import { EntityFetchData } from "@/lib/actions";
-import { ListChannelRoleMembers } from "@/lib/roles";
+import { ListChannelRoleMembers, ListChannelRoles } from "@/lib/roles";
 
 interface Props {
   selectedChannel: string | null;
