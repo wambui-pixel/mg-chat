@@ -178,7 +178,7 @@ export function ChatView({
         <div className="text-center">
           <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Welcome to SuperMQ Chat
+            Welcome to MG Chat
           </h3>
           <p className="text-gray-500">
             Create a channel or start a direct message to begin chatting

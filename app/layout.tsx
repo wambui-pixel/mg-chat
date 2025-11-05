@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SuperMQ Chat",
-  description: "This is a chat app by supermq",
+  title: "MG Chat",
+  description: "This is a chat app by Magistrala",
 };
 
 export default function RootLayout({
