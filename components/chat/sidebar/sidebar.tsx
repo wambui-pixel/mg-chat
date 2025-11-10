@@ -16,6 +16,7 @@ import { InviteMember } from "../invite-user-dialog";
 import { Settings } from "./settings";
 import { NotificationsBell } from "@/components/invitations/view-invitations";
 import { GetUserInvitations } from "@/lib/invitations";
+import { ChatMemberActions } from "@/lib/data";
 
 interface Props {
   session: Session;
@@ -50,7 +51,7 @@ export function Sidebar({
 
   const getData = useCallback(async () => {
     const groupResponse = await ListChannels({
-      queryParams: { offset: 0, limit: 100, tag: "chat" },
+      queryParams: { offset: 0, limit: 100, tag: "chat", actions: ChatMemberActions },
     });
     if (groupResponse.data) {
       setChannels(groupResponse.data.channels);

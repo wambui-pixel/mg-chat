@@ -1,0 +1,1 @@
+export const ChatMemberActions =  ["read", "publish", "subscribe", "view_role_users", "update", "manage_role"];
