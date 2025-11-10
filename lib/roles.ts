@@ -13,11 +13,11 @@ export const AddChannelRoleMembers = async (
   roleId: string,
   members: string[],
 ) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const addedMembers = await mgSdk.Channels.AddChannelRoleMembers(
       channelId,
-      domainId,
+      workspaceId,
       roleId,
       members,
       accessToken,
@@ -42,11 +42,11 @@ export const ListChannelRoleMembers = async (
   roleId: string,
   queryParams: PageMetadata,
 ) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const members = await mgSdk.Channels.ListChannelRoleMembers(
       channelId,
-      domainId,
+      workspaceId,
       roleId,
       queryParams,
       accessToken,
@@ -71,12 +71,12 @@ export const CreateChannelRole = async (
   optionalActions?: string[],
   optionalMembers?: string[],
 ) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const role = await mgSdk.Channels.CreateChannelRole(
       channelId,
       roleName,
-      domainId,
+      workspaceId,
       accessToken,
       optionalActions,
       optionalMembers,
@@ -97,11 +97,11 @@ export const CreateChannelRole = async (
 };
 
 export const ListChannelRoles = async ({ id, queryParams }: RequestOptions) => {
-  const { domainId, accessToken } = await validateOrGetToken("");
+  const { workspaceId, accessToken } = await validateOrGetToken("");
   try {
     const rolesPage = await mgSdk.Channels.ListChannelRoles(
       id as string,
-      domainId,
+      workspaceId,
       queryParams,
       accessToken,
     );

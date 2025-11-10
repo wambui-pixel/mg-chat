@@ -1,11 +1,14 @@
 import type { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import ChatPage from "@/components/chat/chat-page";
+import { FetchData } from "@/lib/actions";
 import { ListChannels } from "@/lib/channels";
 import { GetWorkspaceInvitations } from "@/lib/invitations";
+import { RequestOptions } from "@/lib/magistrala";
 import { getServerSession } from "@/lib/nextauth";
 import { UserProfile } from "@/lib/users";
 import { ListWorkspaces, ListWorkspaceUsers } from "@/lib/workspace";
-import type { Member } from "@/types/entities";
+import { UserRole } from "@/types/auth";
+import { EntityType, type Member } from "@/types/entities";
 
 export type Props = {
   searchParams?: Promise<{
@@ -29,24 +32,46 @@ export default async function Page({ searchParams }: Props) {
   });
   const searchParamsValue = await searchParams;
   const status = searchParamsValue?.status || "pending";
-  const inviResponse = await GetWorkspaceInvitations({
-    offset: 0,
-    limit: 100,
-    state: status,
-  });
+  const isAdmin = session?.user.role === UserRole.Admin;
+  let inviResponse;
+  if (isAdmin) {
+    inviResponse = await GetWorkspaceInvitations({
+      offset: 0,
+      limit: 100,
+      state: status,
+    });
+  }
   const dmChannelResponse = await ListChannels({
     queryParams: { offset: 0, limit: 1, tag: "dm" },
   });
   const dmChannelId = dmChannelResponse?.data?.channels?.[0]?.id;
   const user = await UserProfile(session.accessToken);
 
+  const getWorkspaceUsers = ({ id, queryParams }: RequestOptions) => {
+    return ListWorkspaceUsers(id!, queryParams);
+  };
+
+  const initMembers = await FetchData(
+    EntityType.Member,
+    {
+      offset: 0,
+      limit: 20,
+      status: "enabled",
+    },
+    getWorkspaceUsers,
+    workspaceId,
+  );
+
   return (
     <ChatPage
       session={session}
       members={memResponse.data?.members as Member[]}
-      invitationsPage={inviResponse?.data as InvitationsPage}
+      invitationsPage={
+        isAdmin ? (inviResponse?.data as InvitationsPage) : undefined
+      }
       dmChannelId={dmChannelId as string}
       user={user.data as User}
+      initMembers={initMembers}
     />
   );
 }

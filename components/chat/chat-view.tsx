@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, Hash, MessageCircle } from "lucide-react";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
-import { Channel, ChannelsPage, Client, User } from "@absmach/magistrala-sdk";
-import { ListChannelMembers, ListChannelRoles, ViewChannel } from "@/lib/channels";
+import { Channel, ChannelsPage, Client, MembersPage, User, UserBasicInfo } from "@absmach/magistrala-sdk";
+import { ListChannelMembers, ViewChannel } from "@/lib/channels";
 import { useWebSocket } from "../providers/socket-provider";
 import { Session } from "@/types/auth";
 import { UserProfile, ViewUser } from "@/lib/users";
@@ -14,6 +14,7 @@ import { GetMessages } from "@/lib/messages";
 import { ChatMenu } from "./chat-menu";
 import { EntityFetchData } from "@/lib/actions";
 import { ListChannelRoleMembers, ListChannelRoles } from "@/lib/roles";
+import { RoleMembersPage } from "@/types/entities";
 
 interface Props {
   selectedChannel: string | null;
@@ -45,7 +46,7 @@ export function ChatView({
   const { workspace } = session;
   const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
   const [dmUserInfo, setDmUserInfo] = useState<User | null>(null);
-  const [members, setMembers] = useState<UserBasicInfo[]>([]);
+  const [members, setMembers] = useState<RoleMembersPage>();
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -161,6 +162,7 @@ export function ChatView({
   useEffect(() => {
     const getMembers = async () => {
       const roleResponse = await ListChannelRoles({
+        id: selectedChannel as string,
         queryParams: { offset: 0, limit: 10 },
       });
 
@@ -178,7 +180,7 @@ export function ChatView({
       },
       );
       if (response.data) {
-        setMembers(response.data.members);
+        setMembers(response.data);
       }
     };
     getMembers();
@@ -199,7 +201,6 @@ export function ChatView({
       </div>
     );
   }
-
 
   return (
     <div className="flex-1 flex flex-col bg-white">
@@ -223,14 +224,14 @@ export function ChatView({
                 <h2 className="font-semibold text-gray-900">{channelInfo?.name}</h2>
                 {channelInfo?.tags?.includes("chat") && (
                   <p className="text-xs text-gray-500">
-                    {members?.length} {members?.length === 1 ? "member" : "members"}
+                    {members?.total} {members?.total === 1 ? "member" : "members"}
                   </p>
                 )}
               </div>
             </>
           )}
         </div>
-        <ChatMenu channelId={channelInfo?.id as string} chatName={channelInfo?.name as string} domainId={domain?.id as string} initMembers={initMembers} />
+        <ChatMenu channelId={channelInfo?.id as string} chatName={channelInfo?.name as string} workspaceId={workspace?.id as string} initMembers={initMembers} />
       </div>
 
       <div className="flex-1 flex flex-col">

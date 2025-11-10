@@ -68,7 +68,7 @@ export function CreateChannelDialog({ setRevalidate, workspaceId }: Props) {
       if (ruleResponse.error !== null) {
         toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
       } else {
-        const optionalActions = ["read", "publish", "subscribe", "view_role_users"];
+        const optionalActions = ["read", "publish", "subscribe", "view_role_users", "update", "manage_role"];
         const roleResponse = await CreateChannelRole(
           response?.data?.id as string,
           "chat-member",

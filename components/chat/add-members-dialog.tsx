@@ -17,7 +17,7 @@ import { AddChannelRoleMembers } from "@/lib/roles";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InfiniteSelect } from "../custom/infinite-select";
 import { EntityType } from "@/types/entities";
-import { ListDomainUsers } from "@/lib/workspace";
+import { ListWorkspaceUsers } from "@/lib/workspace";
 import { EntityFetchData } from "@/lib/actions";
 import { RequestOptions } from "@/lib/magistrala";
 import { ListChannelRoles } from "@/lib/roles";
@@ -33,14 +33,14 @@ export const AddRoleMembersDialog = ({
     channelId,
     chatName,
     initMembers,
-    domainId,
+    workspaceId,
 }: {
     open: boolean;
     setOpen: (open: boolean) => void;
     channelId: string;
     chatName: string;
     initMembers: EntityFetchData;
-    domainId: string;
+    workspaceId: string;
 }) => {
     const [processing, setProcessing] = useState(false);
     const form = useForm<z.infer<ReturnType<typeof addRoleMembersFormSchema>>>({
@@ -58,8 +58,8 @@ export const AddRoleMembersDialog = ({
         toast.loading("Adding chat member...", {
             id: toastId,
         });
-
         const roleResponse = await ListChannelRoles({
+            id: channelId,
             queryParams: { offset: 0, limit: 10 },
         });
 
@@ -114,7 +114,7 @@ export const AddRoleMembersDialog = ({
                                         field={field}
                                         initData={initMembers}
                                         entityType={EntityType.Member}
-                                        getData={(options: RequestOptions) => ListDomainUsers(domainId, options)}
+                                        getData={(options: RequestOptions) => ListWorkspaceUsers(workspaceId, options)}
                                         disableSearch={true}
                                     />
                                 </FormItem>

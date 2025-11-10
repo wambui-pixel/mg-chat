@@ -17,12 +17,12 @@ export function ChatMenu({
     channelId,
     chatName,
     initMembers,
-    domainId,
+    workspaceId,
 }: {
     channelId: string;
     chatName: string;
     initMembers: EntityFetchData;
-    domainId: string;
+    workspaceId: string;
 }) {
     const [showMembersDialog, setShowMembersDialog] = useState(false);
     return (
@@ -52,7 +52,7 @@ export function ChatMenu({
                 channelId={channelId}
                 chatName={chatName}
                 initMembers={initMembers}
-                domainId={domainId}
+                workspaceId={workspaceId}
             />
         </>
     );

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Hash } from "lucide-react";
-import { Session } from "@/types/auth";
+import { Session, UserRole } from "@/types/auth";
 import { NavUser } from "./nav-user";
 import { CreateChannelDialog } from "@/components/chat/create-channel-dialog";
 import { ListChannels } from "@/lib/channels";
@@ -44,6 +44,7 @@ export function Sidebar({
   const [revalidate, setRevalidate] = useState(false);
   const [directMessages, setDirectMessages] = useState<string | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const isAdmin = session?.user.role === UserRole.Admin;
 
   const workspaceId = session.workspace?.id;
 
@@ -122,8 +123,8 @@ export function Sidebar({
             <p className="text-xs text-gray-300 truncate">{workspace?.route}</p>
           </div> 
         </Button>
-        <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} />
-        <NotificationsBell invitations={invitations} isSidebar={true} className="mt-4 ml-4"/>
+        {isAdmin &&  <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} /> }
+      <NotificationsBell invitations={invitations} isSidebar={true} className="mt-4 ml-4"/>
       </div>
 
       <ScrollArea className="flex-1">
@@ -201,7 +202,7 @@ export function Sidebar({
                 );
               })}
             </div>
-            <InviteMember workspaceId={workspaceId as string} />
+            {isAdmin && <InviteMember workspaceId={workspaceId as string} />}
           </div>
         </div>
       </ScrollArea>

@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@absmach/magistrala-sdk": "^0.17.6",
+    "@absmach/magistrala-sdk": "^0.17.11",
     "@codemirror/autocomplete": "^6.18.7",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.11.3",
