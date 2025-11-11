@@ -48,10 +48,11 @@ export function Sidebar({
   const isAdmin = session?.user.role === UserRole.Admin;
 
   const workspaceId = session.workspace?.id;
+  const roles = session.workspace?.roles;
 
   const getData = useCallback(async () => {
     const groupResponse = await ListChannels({
-      queryParams: { offset: 0, limit: 100, tag: "chat", actions: ChatMemberActions },
+      queryParams: { offset: 0, limit: 100, tag: "chat", actions: ChatMemberActions, user_id: session.user?.id },
     });
     if (groupResponse.data) {
       setChannels(groupResponse.data.channels);
@@ -124,7 +125,12 @@ export function Sidebar({
             <p className="text-xs text-gray-300 truncate">{workspace?.route}</p>
           </div> 
         </Button>
-        {isAdmin &&  <Settings workspaceId={workspace?.id as string} invitationsPage={invitationsPage} /> }
+        {roles?.some((role) => role.role_name === "admin") && (
+          <Settings
+            workspaceId={workspace?.id as string}
+            invitationsPage={invitationsPage}
+          />
+        )}
       <NotificationsBell invitations={invitations} isSidebar={true} className="mt-4 ml-4"/>
       </div>
 

@@ -7,7 +7,6 @@ import { RequestOptions } from "@/lib/magistrala";
 import { getServerSession } from "@/lib/nextauth";
 import { UserProfile } from "@/lib/users";
 import { ListWorkspaces, ListWorkspaceUsers } from "@/lib/workspace";
-import { UserRole } from "@/types/auth";
 import { EntityType, type Member } from "@/types/entities";
 
 export type Props = {
@@ -32,9 +31,9 @@ export default async function Page({ searchParams }: Props) {
   });
   const searchParamsValue = await searchParams;
   const status = searchParamsValue?.status || "pending";
-  const isAdmin = session?.user.role === UserRole.Admin;
+  const roles = session?.workspace?.roles || [];
   let inviResponse;
-  if (isAdmin) {
+  if (roles.some((role) => role.role_name === "admin")) {
     inviResponse = await GetWorkspaceInvitations({
       offset: 0,
       limit: 100,
@@ -66,9 +65,7 @@ export default async function Page({ searchParams }: Props) {
     <ChatPage
       session={session}
       members={memResponse.data?.members as Member[]}
-      invitationsPage={
-        isAdmin ? (inviResponse?.data as InvitationsPage) : undefined
-      }
+      invitationsPage={inviResponse?.data as InvitationsPage}
       dmChannelId={dmChannelId as string}
       user={user.data as User}
       initMembers={initMembers}

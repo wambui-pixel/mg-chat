@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/chat/sidebar/sidebar";
 import { ChatView } from "@/components/chat/chat-view";
 import { Session } from "@/types/auth";
-import { InvalidEvent, useState } from "react";
+import { useState } from "react";
 import { Member } from "@/types/entities";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
 import { EntityFetchData } from "@/lib/actions";
