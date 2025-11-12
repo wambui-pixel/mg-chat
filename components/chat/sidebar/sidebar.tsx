@@ -45,7 +45,6 @@ export function Sidebar({
   const [revalidate, setRevalidate] = useState(false);
   const [directMessages, setDirectMessages] = useState<string | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const isAdmin = session?.user.role === UserRole.Admin;
 
   const workspaceId = session.workspace?.id;
   const roles = session.workspace?.roles;
@@ -209,7 +208,7 @@ export function Sidebar({
                 );
               })}
             </div>
-            {isAdmin && <InviteMember workspaceId={workspaceId as string} />}
+            {roles?.some((role) => role.role_name === "admin") && <InviteMember workspaceId={workspaceId as string} />}
           </div>
         </div>
       </ScrollArea>

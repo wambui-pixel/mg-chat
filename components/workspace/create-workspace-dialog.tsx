@@ -45,50 +45,46 @@ export function CreateWorkspaceDialog({ isMobile }: Props) {
 
     const result = await CreateWorkspace(newWorkspace);
     if (result.error === null) {
-      const optionalActions = ["read", "view_role_users", "channel_create"]
+      const optionalActions = ["read", "view_role_users", "channel_create"];
       const roleResponse = await CreateWorkspaceRole("domain-member", result?.data?.id as string, optionalActions);
+
       if (roleResponse.error !== null) {
-        toast.error(`Failed to create workspace role with error: ${roleResponse.error}`, { id: toastId });
+        toast.error(`Failed to create workspace role: ${roleResponse.error}`, { id: toastId });
       } else {
-        toast.success("Workspace created successfully", { id: toastId });
-      }
-    } else {
-      const createChanresp = await CreateChannel(
-        { name: "direct-message", tags: ["dm"] },
-        result?.data.id as string
-      );
-
-      if (createChanresp.error !== null) {
-        toast.error(`Failed to create channel with error: ${createChanresp.error}`, { id: toastId });
-      } else {
-        const rule: Rule = {
-          input_channel: createChanresp.data.id,
-          input_topic: "",
-          outputs: [{ type: OutputType.SAVE_SENML }],
-          logic: {
-            type: 0,
-            value:
-              "\n" +
-              "        function logicFunction()\n" +
-              "   return message.payload\n" +
-              " end\n" +
-              "\n" +
-              "return logicFunction()\n" +
-              "      ",
-          },
-          name: `${createChanresp.data.name}save_messages`,
-        };
-
-        const ruleResponse = await CreateRule({rule, workspace: result?.data?.id});
-        if (ruleResponse.error !== null) {
-          toast.error(`Failed to create rule with error: ${ruleResponse.error}`, { id: toastId });
+        const createChanresp = await CreateChannel({ name: "direct-message", tags: ["dm"] }, result?.data?.id as string);
+        if (createChanresp.error !== null) {
+          toast.error(`Failed to create channel: ${createChanresp.error}`, { id: toastId });
         } else {
-          toast.success("Workspace created successfully", { id: toastId });
-          setOpen(false);
-          setName("");
-          setRoute("");
+          const rule: Rule = {
+            input_channel: createChanresp.data.id,
+            input_topic: "",
+            outputs: [{ type: OutputType.SAVE_SENML }],
+            logic: {
+              type: 0,
+              value: `
+        function logicFunction()
+          return message.payload
+        end
+
+        return logicFunction()
+        `,
+            },
+            name: `${createChanresp.data.name}save_messages`,
+          };
+
+          const ruleResponse = await CreateRule({ rule, workspace: result.data!.id });
+          if (ruleResponse.error !== null) {
+            toast.error(`Failed to create rule: ${ruleResponse.error}`, { id: toastId });
+          } else {
+            toast.success("Workspace created successfully", { id: toastId });
+            setOpen(false);
+            setName("");
+            setRoute("");
+          }
         }
       }
+    } else {
+      toast.error(`Failed to create workspace: ${result.error}`, { id: toastId });
     }
   }
 
