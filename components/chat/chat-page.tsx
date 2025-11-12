@@ -6,6 +6,7 @@ import { Session } from "@/types/auth";
 import { useState } from "react";
 import { Member } from "@/types/entities";
 import { InvitationsPage, User } from "@absmach/magistrala-sdk";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 
 interface Props {
   session: Session;
@@ -20,35 +21,32 @@ export default function ChatPage({ session, members, invitationsPage, dmChannelI
   const workspaceId = session.workspace
   return (
     <>
-      <div
-        className={`
-            fixed lg:relative inset-y-0 left-0 z-50 w-[300px] shadow-lg transform transition-transform duration-300 ease-in-out
-            
-          `}
-      >
-        <Sidebar
-          session={session}
-          selectedChannel={selectedChannel}
-          selectedDM={selectedDM}
-          setSelectedChannel={setSelectedChannel}
-          setSelectedDM={setSelectedDM}
-          members={members}
-          invitationsPage={invitationsPage}
-          dmChannelId={dmChannelId as string} 
-          user={user}
-        />
-      </div>
-
-      <div className="flex-1 flex flex-col">
-        <ChatView
-          selectedChannel={selectedChannel}
-          setSelectedChannel={setSelectedChannel}
-          selectedDM={selectedDM}
-          session={session}
-          workspaceId={workspaceId as string}
-          dmChannelId={dmChannelId as string} 
-        />
-      </div>
+      <ResizablePanelGroup direction="horizontal" className="h-screen w-full">
+        <ResizablePanel defaultSize={25} minSize={15} maxSize={50}>
+          <Sidebar
+            session={session}
+            selectedChannel={selectedChannel}
+            selectedDM={selectedDM}
+            setSelectedChannel={setSelectedChannel}
+            setSelectedDM={setSelectedDM}
+            members={members}
+            invitationsPage={invitationsPage}
+            dmChannelId={dmChannelId as string}
+            user={user}
+          />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={75} minSize={15} className="flex-1 flex flex-col">
+          <ChatView
+            selectedChannel={selectedChannel}
+            setSelectedChannel={setSelectedChannel}
+            selectedDM={selectedDM}
+            session={session}
+            workspaceId={workspaceId as string}
+            dmChannelId={dmChannelId as string}
+            />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </>
   );
 }
