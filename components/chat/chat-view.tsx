@@ -175,9 +175,9 @@ export function ChatView({
         selectedChannel as string,
         roleId,
         {
-        offset: 0,
-        limit: 100,
-      },
+          offset: 0,
+          limit: 100,
+        },
       );
       if (response.data) {
         setMembers(response.data);
@@ -231,7 +231,7 @@ export function ChatView({
             </>
           )}
         </div>
-        <ChatMenu channelId={channelInfo?.id as string} chatName={channelInfo?.name as string} workspaceId={workspace?.id as string} initMembers={initMembers} />
+        {!selectedDM && <ChatMenu channelId={channelInfo?.id as string} chatName={channelInfo?.name as string} workspaceId={workspace?.id as string} initMembers={initMembers} />}
       </div>
 
       <div className="flex-1 flex flex-col">
